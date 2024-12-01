@@ -10,4 +10,5 @@ return [
             'class' => \yii\caching\FileCache::class,
         ],
     ],
+    'name' => 'URL Checker',
 ];

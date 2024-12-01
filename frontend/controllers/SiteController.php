@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\UrlCheck;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -75,7 +76,25 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $model = new UrlCheck();
+
+        if (Yii::$app->request->isPost) {
+            // Загружаем данные в модель
+            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+                // Сохраняем данные в базу
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', 'URL успешно добавлен для проверки.');
+                } else {
+                    Yii::$app->session->setFlash('error', 'Ошибка сохранения данных.');
+                }
+
+                return $this->refresh();
+            }
+        }
+
+        return $this->render('index', [
+            'model' => $model,
+        ]);
     }
 
     /**

@@ -3,7 +3,10 @@
 namespace backend\controllers;
 
 use common\models\LoginForm;
+use common\models\UrlCheck;
+use common\models\UrlCheckResult;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -30,7 +33,7 @@ class SiteController extends Controller
                     [
                         'actions' => ['logout', 'index'],
                         'allow' => true,
-                        'roles' => ['@'],
+//                        'roles' => ['@'],
                     ],
                 ],
             ],
@@ -62,8 +65,38 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        // DataProvider для списка URL-ов
+        $urlDataProvider = new ActiveDataProvider([
+            'query' => UrlCheck::find(),
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_DESC,
+                ],
+            ],
+        ]);
+
+        // DataProvider для списка проверок
+        $checkResultsDataProvider = new ActiveDataProvider([
+            'query' => UrlCheckResult::find(),
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+            'sort' => [
+                'defaultOrder' => [
+                    'timestamp' => SORT_DESC,
+                ],
+            ],
+        ]);
+
+        return $this->render('index', [
+            'urlDataProvider' => $urlDataProvider,
+            'checkResultsDataProvider' => $checkResultsDataProvider,
+        ]);
     }
+
 
     /**
      * Login action.
